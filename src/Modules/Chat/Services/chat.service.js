@@ -1,3 +1,5 @@
+import { pool } from "../../../DB/connection.js";
+
 export const sendUserMessage = async (req, res) => {
   try {
     const userId = req.user.user_id;
