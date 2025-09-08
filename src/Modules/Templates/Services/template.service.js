@@ -5,14 +5,27 @@ export const addTemplate = async (req, res) => {
   try {
     const { name, content } = req.body;
 
-    const query = `
+    // First check if a template with this name already exists
+    const checkQuery = `
+      SELECT id FROM tbl_templates WHERE name = $1
+    `;
+    const checkResult = await pool.query(checkQuery, [name]);
+
+    if (checkResult.rows.length > 0) {
+      return res.status(409).json({ 
+        error: "Template with this name already exists" 
+      });
+    }
+
+    // If name doesn't exist, proceed with insertion
+    const insertQuery = `
       INSERT INTO tbl_templates 
         (name, content)
       VALUES ($1, $2)
       RETURNING *
     `;
     const values = [name, content];
-    const result = await pool.query(query, values);
+    const result = await pool.query(insertQuery, values);
 
     res.json({
       message: "Template added successfully!",
