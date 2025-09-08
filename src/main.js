@@ -1,7 +1,7 @@
 import express from "express";
 import { config } from "dotenv";
 config();
-import "./utils/mailService.js";   // <-- You already added this, keep it
+import "./utils/mailService.js";  
 import userController from './Modules/User/user.controller.js';
 import authController from './Modules/Auth/auth.controller.js';
 import planController from './Modules/Plan/plan.controller.js';
@@ -11,6 +11,7 @@ import uploadController from './Modules/UploadFiles/uploadFiles.controller.js';
 import cors from 'cors';
 import authAdminController from "./Modules/AuthAdmin/auth-admin.controller.js";
 import templateController from "./Modules/Templates/template.controller.js";
+import chatController from "./Modules/Chat/chat.controller.js";
 export const bootstrap = () => {
   const app = express();
   app.use(express.json());
@@ -25,6 +26,7 @@ export const bootstrap = () => {
   // Routes
   app.use("/auth", authController);
   app.use("/template", templateController);
+  app.use("/chat", chatController);
   app.use("/user", userController);
   app.use("/admin", adminController);
   app.use("/auth-admin", authAdminController);

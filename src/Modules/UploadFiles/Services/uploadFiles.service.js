@@ -11,7 +11,7 @@ export const uploadFile = async (req, res) => {
         status: "error",
         message: "fileName is required",
       });
-    }
+    }    
 
     // 1. Get user plan and upload limit
     const planResult = await pool.query(
