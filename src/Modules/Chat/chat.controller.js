@@ -7,6 +7,6 @@ const chatController = Router();
 chatController.post("/start" ,authenticate,chatService.startChat);
 chatController.post("/user" ,authenticate,chatService.sendUserMessage);
 chatController.post("/ai",authenticate ,chatService.sendAIMessage);
-chatController.get("/:id", authenticate ,chatService.getChatHistory);
+chatController.get("/:chatId", authenticate ,chatService.getChatHistory);
 
 export default chatController;
