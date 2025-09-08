@@ -1,55 +1,79 @@
 import { pool } from "../../../DB/connection.js";
+import { v4 as uuidv4 } from "uuid";
+
+export const startChat = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const chatId = uuidv4();
+
+    res.json({ chatId });
+  } catch (err) {
+    console.error("Start Chat Error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
 
 export const sendUserMessage = async (req, res) => {
   try {
     const userId = req.user.user_id;
-    const { message } = req.body;
+    const { chatId, message } = req.body;
 
     const result = await pool.query(
-      `INSERT INTO tbl_chats (user_id, sender, message) 
-       VALUES ($1, 'user', $2) RETURNING *`,
-      [userId, message]
+      `INSERT INTO tbl_chats (chat_id, user_id, sender, message)
+       VALUES ($1, $2, 'user', $3)
+       RETURNING *`,
+      [chatId, userId, message]
     );
 
-    res.json({ success: true, chat: result.rows[0] });
+    res.json({ message: "User message saved", data: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Send User Message Error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 
-export const sendAIResponse = async (req, res) => {
+
+export const sendAIMessage = async (req, res) => {
   try {
     const userId = req.user.user_id;
-    const { jsonResponse } = req.body;
+    const { chatId, jsonResponse } = req.body;
 
     const result = await pool.query(
-      `INSERT INTO tbl_chats (user_id, sender, json_response) 
-       VALUES ($1, 'ai', $2::jsonb) RETURNING *`,
-      [userId, JSON.stringify(jsonResponse)]
+      `INSERT INTO tbl_chats (chat_id, user_id, sender, json_response)
+       VALUES ($1, $2, 'ai', $3)
+       RETURNING *`,
+      [chatId, userId, jsonResponse]
     );
 
-    res.json({ success: true, chat: result.rows[0] });
+    res.json({ message: "AI message saved", data: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Send AI Message Error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 
 export const getChatHistory = async (req, res) => {
   try {
     const userId = req.user.user_id;
+    const { chatId } = req.params;
 
     const result = await pool.query(
-      `SELECT * FROM tbl_chats 
-        WHERE user_id = $1 
+      `SELECT * FROM tbl_chats
+        WHERE chat_id = $1 AND user_id = $2
         ORDER BY created_at ASC`,
-      [userId]
+      [chatId, userId]
     );
 
-    res.json({ success: true, chats: result.rows });
+    res.json({ chat: result.rows });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Get Chat History Error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
