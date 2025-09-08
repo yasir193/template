@@ -3,7 +3,7 @@ import { pool } from "../../../DB/connection.js";
 // Add Template
 export const addTemplate = async (req, res) => {
   try {
-    const { name, content } = req.body;
+    const { name, type, content } = req.body;
 
     // First check if a template with this name already exists
     const checkQuery = `
@@ -12,19 +12,19 @@ export const addTemplate = async (req, res) => {
     const checkResult = await pool.query(checkQuery, [name]);
 
     if (checkResult.rows.length > 0) {
-      return res.status(409).json({ 
-        error: "Template with this name already exists" 
+      return res.status(409).json({
+        error: "Template with this name already exists",
       });
     }
 
     // If name doesn't exist, proceed with insertion
     const insertQuery = `
       INSERT INTO tbl_templates 
-        (name, content)
-      VALUES ($1, $2)
+        (name,type ,content)
+      VALUES ($1, $2, $3)
       RETURNING *
     `;
-    const values = [name, content];
+    const values = [name, type, content];
     const result = await pool.query(insertQuery, values);
 
     res.json({
@@ -37,7 +37,7 @@ export const addTemplate = async (req, res) => {
 };
 
 export const getAllTemplates = async (req, res) => {
-  const query = `select id , name from tbl_templates`;
+  const query = `select id , name  , type from tbl_templates`;
 
   const result = await pool.query(query);
   try {
@@ -48,9 +48,7 @@ export const getAllTemplates = async (req, res) => {
 };
 
 export const getSpecificTemplate = async (req, res) => {
-
-  const {id} = req.params;
-
+  const { id } = req.params;
 
   const query = `
   select * from tbl_templates where id = ($1)
@@ -58,13 +56,11 @@ export const getSpecificTemplate = async (req, res) => {
 
   const value = [id];
 
-  const result = await pool.query(query,value)
+  const result = await pool.query(query, value);
 
   try {
-    res.json({message : 'success' , data : result.rows[0]})
+    res.json({ message: "success", data: result.rows[0] });
   } catch (error) {
-    res.json({error : error.message})
+    res.json({ error: error.message });
   }
-
-
 };
