@@ -13,8 +13,6 @@ export const startChat = async (req, res) => {
   }
 };
 
-
-
 export const sendUserMessage = async (req, res) => {
   try {
     const userId = req.user.user_id;
@@ -33,8 +31,6 @@ export const sendUserMessage = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-
 
 export const sendAIMessage = async (req, res) => {
   try {
@@ -55,8 +51,6 @@ export const sendAIMessage = async (req, res) => {
   }
 };
 
-
-
 export const getChatHistory = async (req, res) => {
   try {
     const userId = req.user.user_id;
@@ -75,5 +69,3 @@ export const getChatHistory = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-
