@@ -1,39 +1,39 @@
 import { Router } from "express";
 import * as adminService from "./Services/admin.service.js";
 import { verifyAdminToken } from "./../../Middlewares/auth-admin.middleware.js";
-import { errorHandler } from "./../../Middlewares/error-handler.middleware.js";
+// import { errorHandler } from "./../../Middlewares/error-handler.middleware.js";
 
 const adminController = Router();
 
 adminController.post(
   "/",
   verifyAdminToken,
-  errorHandler(adminService.addAdmin)
-);
+  adminService.addAdmin)
+;
 adminController.get(
   "/pending",
-  errorHandler(adminService.getPendingPlanRequests)
-);
+  adminService.getPendingPlanRequests)
+;
 adminController.patch(
   "/approve/:requestId",
-  errorHandler(adminService.approvePlanRequest)
-);
+  adminService.approvePlanRequest)
+;
 adminController.patch(
   "/reject/:requestId",
-  errorHandler(adminService.rejectPlanRequest)
-);
+  adminService.rejectPlanRequest)
+;
 adminController.delete(
   "/:targetId",
   verifyAdminToken,
-  errorHandler(adminService.deleteAdmin)
-);
+  adminService.deleteAdmin)
+;
 adminController.get(
   "/",
   verifyAdminToken,
-  errorHandler(adminService.getAllAdmins)
-);
+  adminService.getAllAdmins)
+;
 adminController.get(
   "/dashboard-stats",
-  errorHandler(adminService.dashboardStats)
-);
+  adminService.dashboardStats)
+;
 export default adminController;

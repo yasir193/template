@@ -12,7 +12,7 @@ import authAdminController from "./Modules/AuthAdmin/auth-admin.controller.js";
 import templateController from "./Modules/Templates/template.controller.js";
 import chatController from "./Modules/Chat/chat.controller.js";
 import "./utils/mailService.js";
-import { globalErrorHandler } from "./Middlewares/error-handler.middleware.js";
+// import { globalErrorHandler } from "./Middlewares/error-handler.middleware.js";
 
 
 
@@ -41,7 +41,7 @@ export const bootstrap = () => {
   app.use("/auth-admin", authAdminController);
   app.use("/plan", planController);
   app.use("/upload", uploadController);
-  app.use(globalErrorHandler)
+  // app.use(globalErrorHandler)
   // Connect DB and start server
   database_connection();
   app.listen(process.env.PORT, () => {
