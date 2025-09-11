@@ -33,7 +33,7 @@ export const addUser = async (req, res) => {
     ).toString();
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, +process.env.SALT);
 
     // Insert user
     const query = `

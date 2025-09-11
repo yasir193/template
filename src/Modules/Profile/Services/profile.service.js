@@ -29,7 +29,7 @@ export const getProfile = async (req, res) => {
 
   res.status(200).json({
     message: 'Data fetched successfully',
-    data: { ...userWithoutPhone, phone: decryptedPhone } // keep phone inside data
+    data: { ...userWithoutPhone, phone: decryptedPhone }
   });
 } catch (error) {
   res.status(500).json({ message: error.message });
