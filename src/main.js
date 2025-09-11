@@ -13,6 +13,7 @@ import templateController from "./Modules/Templates/template.controller.js";
 import chatController from "./Modules/Chat/chat.controller.js";
 import "./utils/mailService.js";
 // import { globalErrorHandler } from "./Middlewares/error-handler.middleware.js";
+import profileController from './Modules/Profile/profile.controller.js';
 
 
 
@@ -37,6 +38,7 @@ export const bootstrap = () => {
   app.use("/template", templateController);
   app.use("/chat", chatController);
   app.use("/user", userController);
+  app.use("/profile", profileController);
   app.use("/admin", adminController);
   app.use("/auth-admin", authAdminController);
   app.use("/plan", planController);

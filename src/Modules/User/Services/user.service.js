@@ -1,6 +1,7 @@
 import { pool } from "../../../DB/connection.js";
 import CryptoJS from "crypto-js";
 import { config } from "dotenv";
+import bcrypt from "bcrypt";
 config();
 // Add User
 export const addUser = async (req, res) => {
@@ -16,20 +17,32 @@ export const addUser = async (req, res) => {
       phone,
     } = req.validatedUser;
 
+    // Check if email exists
     const emailCheck = await pool.query(
       "SELECT 1 FROM tbl_users WHERE email = $1",
       [email]
     );
-
     if (emailCheck.rows.length > 0) {
       return res.status(400).json({ error: "Email already exists" });
     }
+
+    // Encrypt phone
+    const encryptedPhone = CryptoJS.AES.encrypt(
+      phone,
+      process.env.CRYPTO_SECRET
+    ).toString();
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert user
     const query = `
       INSERT INTO tbl_users 
         (name, email, job_title, typeOfUser, business_name, business_sector, password, phone)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING user_id, name, email
+      RETURNING user_id, name, email, job_title, typeOfUser, business_name, business_sector, phone, created_at
     `;
+
     const values = [
       name,
       email,
@@ -37,19 +50,25 @@ export const addUser = async (req, res) => {
       typeOfUser,
       business_name,
       business_sector,
-      password,
-      phone,
+      hashedPassword,
+      encryptedPhone,
     ];
+
     const result = await pool.query(query, values);
 
-    res.json({
-      message: "User added successfully!",
-      data: result.rows[0],
+    // Return saved user (with decrypted phone)
+    const savedUser = result.rows[0];
+    const decryptedPhone = phone; // return original phone instead of decrypting again
+
+    res.status(201).json({
+      message: "User created successfully",
+      data: { ...savedUser, phone: decryptedPhone },
     });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
+
 
 
 export const getAllUsers = async (req, res) => {
@@ -77,7 +96,7 @@ export const getAllUsers = async (req, res) => {
 
     const result = await pool.query(query);
 
-    // 🔑 decrypt each phone number
+    
     const decryptedUsers = result.rows.map((user) => {
       let decryptedPhone = null;
       try {
