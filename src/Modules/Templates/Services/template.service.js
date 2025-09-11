@@ -5,7 +5,6 @@ export const addTemplate = async (req, res) => {
   try {
     const { name, type, content } = req.body;
 
-    // First check if a template with this name already exists
     const checkQuery = `
       SELECT id FROM tbl_templates WHERE name = $1
     `;

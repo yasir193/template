@@ -20,67 +20,68 @@ export const authenticate = ( req, res, next) => {
 
 
 
+
 export const validateSignUp = (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string().min(2).max(50).required()
       .messages({
-        'string.empty': 'Name is required',
-        'string.min': 'Name should have at least 2 characters',
-        'string.max': 'Name should not exceed 50 characters'
+        "string.empty": "Name is required",
+        "string.min": "Name should have at least 2 characters",
+        "string.max": "Name should not exceed 50 characters"
       }),
-    
+
     email: Joi.string().email().required()
       .messages({
-        'string.email': 'Please provide a valid email address',
-        'string.empty': 'Email is required'
+        "string.email": "Please provide a valid email address",
+        "string.empty": "Email is required"
       }),
-    
+
     job_title: Joi.string().max(100).optional()
       .messages({
-        'string.max': 'Job title should not exceed 100 characters'
+        "string.max": "Job title should not exceed 100 characters"
       }),
-    
-    typeOfUser: Joi.string().valid('person', 'business')
-      // .required()
+
+    typeOfUser: Joi.string().valid("person", "business").required()
       .messages({
-        'any.only': 'Type of user must be either person or business',
-        // 'any.required': 'Type of user is required'
+        "any.only": "Type of user must be either person or business",
+        "any.required": "Type of user is required"
       }),
-    
-    business_name: Joi.when('typeOfUser', {
-      is: 'business',
+
+    business_name: Joi.when("typeOfUser", {
+      is: "business",
       then: Joi.string().min(2).max(100).required()
         .messages({
-          'string.empty': 'Business name is required for business accounts',
-          'string.min': 'Business name should have at least 2 characters',
-          'string.max': 'Business name should not exceed 100 characters'
+          "string.empty": "Business name is required for business accounts",
+          "string.min": "Business name should have at least 2 characters",
+          "string.max": "Business name should not exceed 100 characters"
         }),
-      otherwise: Joi.string().optional().allow('', null)
+      otherwise: Joi.string().optional().allow("", null)
     }),
-    
-    business_sector: Joi.when('typeOfUser', {
-      is: 'business',
+
+    business_sector: Joi.when("typeOfUser", {
+      is: "business",
       then: Joi.string().max(100).optional()
         .messages({
-          'string.max': 'Business sector should not exceed 100 characters'
+          "string.max": "Business sector should not exceed 100 characters"
         }),
-      otherwise: Joi.string().optional().allow('', null)
+      otherwise: Joi.string().optional().allow("", null)
     }),
-    
-    password: Joi.string().min(6).required()
-      .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)'))
+
+    password: Joi.string()
+      .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"))
+      .required()
       .messages({
-        'string.empty': 'Password is required',
-        'string.min': 'Password should have at least 6 characters',
-        'string.pattern.base': 'Password must contain at least one lowercase letter, one uppercase letter, and one number'
+        "string.empty": "Password is required",
+        "string.pattern.base":
+          "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number"
       }),
-    
-    confirmPassword: Joi.string().valid(Joi.ref('password')).required()
+
+    confirmPassword: Joi.string().valid(Joi.ref("password")).required()
       .messages({
-        'any.only': 'Password and Confirm Password must match',
-        'any.required': 'Confirm Password is required'
+        "any.only": "Password and Confirm Password must match",
+        "any.required": "Confirm Password is required"
       }),
-    
+
     phone: Joi.allow()
   }).options({ abortEarly: false });
 
@@ -88,12 +89,12 @@ export const validateSignUp = (req, res, next) => {
 
   if (error) {
     const errorMessages = error.details.map(detail => ({
-      field: detail.path.join('.'),
+      field: detail.path.join("."),
       message: detail.message
     }));
 
     return res.status(400).json({
-      message: 'Validation failed',
+      message: "Validation failed",
       errors: errorMessages
     });
   }
