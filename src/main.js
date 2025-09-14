@@ -14,6 +14,7 @@ import chatController from "./Modules/Chat/chat.controller.js";
 import "./utils/mailService.js";
 import { globalErrorHandler } from "./Middlewares/error-handler.middleware.js";
 import profileController from './Modules/Profile/profile.controller.js';
+import helmet from "helmet";
 
 
 
@@ -23,6 +24,8 @@ import profileController from './Modules/Profile/profile.controller.js';
 export const bootstrap = () => {
   const app = express();
   app.use(express.json());
+
+  app.use(helmet());
 
   app.use(cors());
   app.use(

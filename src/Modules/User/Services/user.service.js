@@ -4,6 +4,7 @@ import { config } from "dotenv";
 import bcrypt from "bcrypt";
 config();
 // Add User
+
 export const addUser = async (req, res) => {
   try {
     const {
@@ -17,7 +18,7 @@ export const addUser = async (req, res) => {
       phone,
     } = req.validatedUser;
 
-    // Check if email exists
+    
     const emailCheck = await pool.query(
       "SELECT 1 FROM tbl_users WHERE email = $1",
       [email]
@@ -26,16 +27,16 @@ export const addUser = async (req, res) => {
       return res.status(400).json({ error: "Email already exists" });
     }
 
-    // Encrypt phone
+    
     const encryptedPhone = CryptoJS.AES.encrypt(
       phone,
       process.env.CRYPTO_SECRET
     ).toString();
 
-    // Hash password
+    
     const hashedPassword = await bcrypt.hash(password, +process.env.SALT);
 
-    // Insert user
+    
     const query = `
       INSERT INTO tbl_users 
         (name, email, job_title, typeOfUser, business_name, business_sector, password, phone)
@@ -56,9 +57,9 @@ export const addUser = async (req, res) => {
 
     const result = await pool.query(query, values);
 
-    // Return saved user (with decrypted phone)
+    
     const savedUser = result.rows[0];
-    const decryptedPhone = phone; // return original phone instead of decrypting again
+    const decryptedPhone = phone;
 
     res.status(201).json({
       message: "User created successfully",
@@ -68,8 +69,6 @@ export const addUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -124,7 +123,6 @@ export const getAllUsers = async (req, res) => {
     res.json({ error: error.message });
   }
 };
-
 
 export const getUserPlan = async (req, res) => {
   try {
@@ -197,7 +195,6 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// Delete User
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -217,11 +214,11 @@ export const deleteUser = async (req, res) => {
 };
 
 export const requestToChangePlan = async (req, res) => {
-  const { requestedPlanId } = req.body; // the plan user wants
-  const userId = req.user.user_id; // assuming auth middleware sets this
+  const { requestedPlanId } = req.body;
+  const userId = req.user.user_id;
 
   try {
-    // check if plan exists
+    
     const planCheck = await pool.query(
       "SELECT * FROM tbl_plans WHERE plan_id = $1",
       [requestedPlanId]
@@ -230,7 +227,7 @@ export const requestToChangePlan = async (req, res) => {
       return res.status(400).json({ message: "Invalid plan selected" });
     }
 
-    // check if user already has a pending request
+    
     const pendingCheck = await pool.query(
       "SELECT 1 FROM tbl_plan_requests WHERE user_id = $1 AND status = 'pending'",
       [userId]
@@ -239,7 +236,7 @@ export const requestToChangePlan = async (req, res) => {
       return res.status(400).json({ message: "You already have a pending request" });
     }
 
-    // insert the request
+    
     const result = await pool.query(
       `INSERT INTO tbl_plan_requests (user_id, requested_plan_id, status) 
         VALUES ($1, $2, 'pending')

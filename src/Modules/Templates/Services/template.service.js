@@ -1,6 +1,5 @@
 import { pool } from "../../../DB/connection.js";
 
-// Add Template
 export const addTemplate = async (req, res) => {
   try {
     const { name, type, content } = req.body;
@@ -16,7 +15,7 @@ export const addTemplate = async (req, res) => {
       });
     }
 
-    // If name doesn't exist, proceed with insertion
+    
     const insertQuery = `
       INSERT INTO tbl_templates 
         (name,type ,content)
@@ -36,15 +35,26 @@ export const addTemplate = async (req, res) => {
 };
 
 export const getAllTemplates = async (req, res) => {
-  const query = `select id , name  , type from tbl_templates`;
+  const query = `SELECT id, name, type FROM tbl_templates`;
 
-  const result = await pool.query(query);
   try {
-    res.json({ message: "fetching data successfully", data: result.rows });
+    const result = await pool.query(query);
+
+    // Group templates by "type"
+    const grouped = result.rows.reduce((acc, template) => {
+      if (!acc[template.type]) {
+        acc[template.type] = [];
+      }
+      acc[template.type].push(template);
+      return acc;
+    }, {});
+
+    res.json({ message: "fetching data successfully", data: grouped });
   } catch (error) {
-    res.json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
+
 
 export const getSpecificTemplate = async (req, res) => {
   const { id } = req.params;
